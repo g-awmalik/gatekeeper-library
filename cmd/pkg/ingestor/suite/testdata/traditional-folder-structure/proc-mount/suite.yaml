@@ -1,0 +1,11 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+tests:
+  - name: psp-proc-mount
+    template: template.yaml
+    constraint: samples/psp-proc-mount/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-proc-mount/example_disallowed.yaml
+        assertions:
+          - violations: yes

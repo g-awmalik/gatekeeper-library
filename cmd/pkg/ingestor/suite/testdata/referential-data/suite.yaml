@@ -1,0 +1,20 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: k8srequirenamespacenetworkpolicies
+tests:
+  - name: k8srequirenamespacenetworkpolicies
+    template: template.yaml
+    constraint: samples/require-namespace-network-policies/constraint.yaml
+    cases:
+      - name: network-policy-exists
+        object: samples/require-namespace-network-policies/example_disallowed_namespace.yaml
+        inventory:
+          - samples/require-namespace-network-policies/example_allowed_network-policy.yaml
+        assertions:
+          - violations: no
+      - name: network-policy-does-not-exist
+        object: samples/require-namespace-network-policies/example_disallowed_namespace.yaml
+        inventory: []
+        assertions:
+          - violations: yes

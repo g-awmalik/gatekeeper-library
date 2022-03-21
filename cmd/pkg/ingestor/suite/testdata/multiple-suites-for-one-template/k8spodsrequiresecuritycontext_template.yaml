@@ -1,0 +1,55 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spodsrequiresecuritycontext
+  annotations:
+    description: >-
+      Requires all Pods and containers to have a SecurityContext defined at the
+      Pod or container level.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPodsRequireSecurityContext
+      validation:
+        openAPIV3Schema: {}
+  targets:
+    - rego: |
+        package k8spodsrequiresecuritycontext
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          container := input.review.object.spec.containers[_]
+          has_empty_security_context(container)
+          has_empty_security_context(input.review.object.spec)
+          msg := "securityContext must be defined for all Pod containers"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          initContainer := input.review.object.spec.initContainers[_]
+          has_empty_security_context(initContainer)
+          has_empty_security_context(input.review.object.spec)
+          msg := "securityContext must be defined for all Pod initContainers"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          not input.review.object.spec.containers
+          not input.review.object.spec.initContainers
+          has_empty_security_context(input.review.object.spec)
+          msg := "securityContext must be defined for Pod"
+        }
+
+        has_empty_security_context(spec) {
+          spec.securityContext == {}
+        }
+
+        has_empty_security_context(spec) {
+          not spec.securityContext
+        }
+
+        has_empty_security_context(spec) {
+          spec.securityContext == null
+        }
+      target: admission.k8s.gatekeeper.sh

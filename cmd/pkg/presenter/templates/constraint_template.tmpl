@@ -1,0 +1,40 @@
+## {{.Name}}
+
+> {{.Description}}
+
+### Constraint schema
+
+{{.Schema}}
+<details>
+  <summary>Examples</summary>
+
+  {{- range $sample := .Samples}}
+
+  #### {{$sample.ConstraintName}}
+  #### Constraint 
+  ```yaml
+  {{$sample.Constraint -}}
+  ```
+
+  {{- if $sample.Allowed }}
+  #### Allowed
+  {{- range $allowed := $sample.Allowed}}
+  ```yaml
+  {{$allowed -}}
+  ```
+  {{end -}}
+  {{else}}
+  {{end -}}
+
+  #### Disallowed
+  {{- range $disallowed := $sample.Disallowed}}
+  ```yaml
+  {{$disallowed -}}
+  ```
+  {{end -}}
+
+  {{- end -}}
+</details>
+
+---
+

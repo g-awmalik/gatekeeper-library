@@ -1,0 +1,31 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequirenamespacenetworkpolicies
+  annotations:
+    description: >-
+      Requires that every namespace defined in the cluster has a NetworkPolicy.
+
+      Note: This constraint is referential. See https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints#referential
+      for details.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequireNamespaceNetworkPolicies
+      validation:
+        openAPIV3Schema: {}
+  targets:
+  - rego: |
+      package k8srequirenamespacenetworkpolicies
+
+      violation[{"msg": msg}] {
+        input.review.kind.kind == "Namespace"
+        not namespace_has_networkpolicy(input.review.object.metadata.name)
+        msg := sprintf("Namespace <%v> does not have a NetworkPolicy", [input.review.object.metadata.name])
+      }
+
+      namespace_has_networkpolicy(ns) {
+        np := data.inventory.namespace[ns][_].NetworkPolicy[_]
+      }
+    target: admission.k8s.gatekeeper.sh

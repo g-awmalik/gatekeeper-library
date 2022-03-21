@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRestrictLabels
+metadata:
+  name: restrict-label-example
+spec:
+  enforcementAction: dryrun
+  parameters:
+    restrictedLabels:
+      - label-example
+    exceptions:
+      - group: ""
+        kind: Pod
+        namespace: default
+        name: allowed-example

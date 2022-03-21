@@ -1,0 +1,13 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: "test-suite"
+tests:
+  - name: disallowedauthzprefix
+    template: disallowedauthzprefix_template.yaml
+    constraint: disallowedauthzprefix_constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: disallowedauthzprefix_disallowed.yaml
+        assertions:
+          - violations: yes

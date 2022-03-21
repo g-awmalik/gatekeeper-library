@@ -1,0 +1,16 @@
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: {{.Kind}}
+metadata:
+  name: example
+spec:
+  # match <object>: allows you to configure which resources fall in scope for
+  # this constraint. For match schema details please refer to:
+  # https://open-policy-agent.github.io/gatekeeper/website/docs/howto/#the-match-field
+  match:
+    [match schema]
+{{- if .Parameters}}
+  parameters:
+{{.Parameters}}
+{{- end}}
+```

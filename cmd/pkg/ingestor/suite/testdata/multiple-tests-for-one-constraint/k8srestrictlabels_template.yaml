@@ -1,0 +1,58 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srestrictlabels
+  annotations:
+    description: >-
+      Disallows resources with any of the specified `restrictedLabels`. Matches on
+      label key names only.  Single object exceptions can be included, identified
+      by their group, kind, namespace, and name.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRestrictLabels
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            exceptions:
+              description: "A list of objects that are exempted from the label restrictions."
+              items:
+                properties:
+                  group:
+                    type: string
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                type: object
+                description: "A single object's identification, based on group, kind, namespace, and name."
+              type: array
+            restrictedLabels:
+              items:
+                type: string
+              type: array
+              description: "A list of label keys strings."
+  targets:
+    - rego: |
+        package k8srestrictlabels
+
+        violation[{"msg": msg}] {
+          input.review.object.metadata.labels[label]
+          restrictedLabel := input.parameters.restrictedLabels[_]
+          label == restrictedLabel
+          not is_exception(input.parameters, input.review)
+          msg := sprintf("<%v> label is restricted", [label])
+        }
+
+        is_exception(parameters, review) {
+          exception := parameters.exceptions[_]
+          review.kind.group == exception.group
+          review.kind.kind == exception.kind
+          review.object.metadata.namespace == exception.namespace
+          review.object.metadata.name == exception.name
+        }
+      target: admission.k8s.gatekeeper.sh

@@ -1,0 +1,12 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: DisallowedAuthzPrefix
+metadata:
+  name: disallowed-authz-prefix-constraint
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: ["security.istio.io"]
+        kinds: ["AuthorizationPolicy"]
+  parameters:
+    disallowedprefixes: ["badprefix", "reallybadprefix"]

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallowed-example
+  namespace: default
+  labels:
+    label-example: example
+spec:
+  containers:
+  - name: nginx
+    image: nginx

@@ -1,0 +1,13 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: suite2
+tests:
+  - name: k8spodsrequiresecuritycontext1
+    template: k8spodsrequiresecuritycontext_template.yaml
+    constraint: constraint.yaml
+    cases:
+      - name: example-allowed
+        object: example_allowed.yaml
+        assertions:
+          - violations: no
